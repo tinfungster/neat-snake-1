@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from neat import nn, population
 import pygame
 import field
@@ -209,7 +208,7 @@ def eval_fitness(genomes):
 			event = pygame.event.wait()
 
 			if event.type == pygame.QUIT: # window closed
-				print "Quittin"
+				print("Quittin")
 				save_object(pop,'population.dat')		## export population
 				pygame.quit()
 				sys.exit()
@@ -296,17 +295,17 @@ def eval_fitness(genomes):
 			#pygame.time.wait(100)
 
 		
-		print "score ",score
+		print ("score "+str(score))
 		score = positivy(score)+1
 		g.fitness = positivy((-1/(math.sqrt(score+1))) + 1)
-		print "Error",error
+		print ("Error"+str(error))
 		best_fitness = max(best_fitness,g.fitness)
-		print "Generation",generation_number, "\tGenome",genome_number,"\tFitness",g.fitness,"\tBest fitness",best_fitness
+		print ("Generation "+str(generation_number) + "\tGenome "+str(genome_number)+"\tFitness "+str(g.fitness)+"\tBest fitness "+str(best_fitness))
 		genome_number += 1
 	generation_number += 1
 	if generation_number % 20 == 0:
 		save_object(pop,'population.dat')
-		print "Exporting population"		## export population
+		print ("Exporting population")		## export population
 	#save_object(pop,'population.dat')		## export population
 	
 
@@ -314,7 +313,7 @@ def eval_fitness(genomes):
 pop = population.Population('config')
 if len(sys.argv) > 1:
 	pop = load_object(sys.argv[1])
-	print "Reading popolation from",sys.argv[1]
+	print ("Reading popolation from "+sys.argv[1])
 pop.run(eval_fitness, 10000)
 
 
