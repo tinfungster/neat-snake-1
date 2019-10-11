@@ -1,9 +1,8 @@
 # Snake-NEAT
 Integrating Neural Evolution In Augmented Topologies in a snake game to make it a self learner.
 
-![alt text][logo]
+![](./screen_shot_1.png)
 
-[logo]: https://github.com/nidhalkratos/Snake-NEAT/blob/master/screen_shot_1.jpg "ScreenShot 1"
 
 # Requirements
 This projects requires pygame python library as well as python-neat library

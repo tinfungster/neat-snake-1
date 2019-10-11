@@ -7,13 +7,13 @@ import math
 import sys
 import pickle
 
-blockSize = 10 # size of blocks
+blockSize = 32 # size of blocks
 width = 12 # size of field width in blocks
 height = 12
 screenSize = (width * blockSize, height * blockSize)
-speed = 1000 # milliseconds per step
-bg_color = 0x00A000
-snake_color = 0x0000FF
+speed = 1 # milliseconds per step
+bg_color = 0x000000
+snake_color = 0xFFFFFF
 
 best_fitness = 0
 
@@ -53,7 +53,6 @@ def get_game_matrix(scr):
 	#print res_matrix
 	return res_matrix
 	
-import pickle 
 def save_object(obj, filename):
     with open(filename, 'wb') as output:
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
