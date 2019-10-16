@@ -7,6 +7,7 @@ import math
 import sys
 import pickle
 
+rendering = True
 blockSize = 32  # size of blocks
 width = 12  # size of field width in blocks
 height = 12
@@ -21,7 +22,9 @@ best_fitness = 0
 pygame.init()
 screen = pygame.display.set_mode(screenSize)
 
+
 pygame.time.set_timer(pygame.USEREVENT, speed)
+clock = pygame.time.Clock()
 scr = pygame.surfarray.pixels2d(screen)
 
 dx = 1
@@ -276,11 +279,13 @@ def eval_fitness(genomes):
                 theFood = food.Food(theField)  # make a new piece of food
                 score += 5
                 hunger += 100
-
-            theField.draw()
-            theFood.draw()
-            theSnake.draw()
-            pygame.display.update()
+            if rendering:
+                theField.draw()
+                theFood.draw()
+                theSnake.draw()
+                pygame.display.update()
+                # nao sei se isso ajuda :s parece que só ta lento mesmo
+                # clock.tick(0)
 
             if event.type == pygame.KEYDOWN:  # key pressed
                 if event.key == pygame.K_LEFT:
@@ -297,29 +302,26 @@ def eval_fitness(genomes):
                     dy = -1
 
         # Game over!
-        for i in range(0, 10):
-            theField.draw()
-            theFood.draw()
-            theSnake.draw(damage=(i % 2 == 0))
-            pygame.display.update()
-        # pygame.time.wait(100)
+        if rendering:
+            for i in range(0, 10):
+                theField.draw()
+                theFood.draw()
+                theSnake.draw(damage=(i % 2 == 0))
+                pygame.display.update()
 
-        print("score " + str(score))
+        # pygame.time.wait(100)
         score = positivy(score) + 1
         g.fitness = positivy((-1 / (math.sqrt(score + 1))) + 1)
-        print("Error" + str(error))
         best_fitness = max(best_fitness, g.fitness)
-        print("Generation " + str(generation_number) + "\tGenome " + str(genome_number) + "\tFitness " + str(
-            g.fitness) + "\tBest fitness " + str(best_fitness))
+        print("Generation " + str(generation_number) + "\tGenome " + str(genome_number) + "\tFitness " + str(g.fitness) + "\tBest fitness " + str(best_fitness) + "\tError " + str(error) + "\tScore " + str(score) )
         genome_number += 1
     generation_number += 1
     if generation_number % 20 == 0:
         save_object(pop, 'population.dat')
-        print("Exporting population")  ## export population
-
-
-# save_object(pop,'population.dat')        ## export population
-
+        print("Exporting population")
+        # export population
+        # save_object(pop,'population.dat')
+        # export population
 
 pop = population.Population('config')
 if len(sys.argv) > 1:
