@@ -1,4 +1,5 @@
-neat-python==0.8
-pygame==1.9.6
 cloudpickle==0.8.0
+neat-python==0.8
+numpy==1.17.2
 pickleshare==0.7.5
+pygame==1.9.6
