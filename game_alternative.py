@@ -374,6 +374,7 @@ def eval_fitness(genomes):
     line_best_fitness.set_ydata(np.array(list_best_fitness))
     line_best_fitness.set_xdata(list(range(len(list_best_fitness))))
     plt.xlim(0, len(list_best_fitness)-1)
+    plt.ylim(0, max(list_best_fitness)+0.5)
     fig.canvas.draw()
     fig.canvas.flush_events()
 
