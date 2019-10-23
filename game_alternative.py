@@ -1,3 +1,4 @@
+import os
 from neat import nn, population
 import pygame
 import field
@@ -199,6 +200,13 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     return [straight_wall, straight_food, left_wall, left_food, right_wall, right_food]
 
 
+def save_best_generation_instance(instance, filename='best_generation_instances.bin'):
+    instances = []
+    if os.path.isfile(filename):
+        instances = load_object(filename)
+    instances.append(instance)
+    save_object(instances, filename)
+
 def eval_fitness(genomes):
     global best_fitness
     global screen
@@ -213,6 +221,7 @@ def eval_fitness(genomes):
     # global dx
     # global dy
     # global speed
+    best_instance = None
     genome_number = 0
     for g in genomes:
 
@@ -306,10 +315,22 @@ def eval_fitness(genomes):
         # pygame.time.wait(100)
         score = positive(score)
         g.fitness = score/100
+
+        if not best_instance or g.fitness > best_fitness:
+            best_instance = {
+                'num_generation': generation_number,
+                'fitness': g.fitness,
+                'score': score,
+                'genome': g,
+                'net': net,
+            }
+
         best_fitness = max(best_fitness, g.fitness)
         # if debuggin:
         print(f"Generation {generation_number} \tGenome {genome_number} \tFitness {g.fitness} \tBest fitness {best_fitness} \tError {error} \tScore {score}")
         genome_number += 1
+
+    save_best_generation_instance(best_instance)
     generation_number += 1
     if generation_number % 20 == 0:
         save_object(pop, 'population.dat')
