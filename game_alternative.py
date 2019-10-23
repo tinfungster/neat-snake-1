@@ -6,6 +6,8 @@ import snake
 import math
 import sys
 import pickle
+from matplotlib import pyplot as plt
+import numpy as np
 
 rendering = True
 debuggin = False
@@ -71,11 +73,8 @@ def load_object(filename):
     return obj
 
 
-def positivy(x):
-    if x > 0:
-        return x
-    else:
-        return 0
+def positive(x):
+    return x if x > 0 else 0
 
 
 def left(orientation):
@@ -288,11 +287,11 @@ def eval_fitness(genomes):
                 pygame.display.update()
 
         # pygame.time.wait(100)
-        score = positivy(score)
+        score = positive(score)
         g.fitness = score/100
         best_fitness = max(best_fitness, g.fitness)
         # if debuggin:
-        print("Generation " + str(generation_number) + "\tGenome " + str(genome_number) + "\tFitness " + str(g.fitness) + "\tBest fitness " + str(best_fitness) + "\tError " + str(error) + "\tScore " + str(score) )
+        print(f"Generation {generation_number} \tGenome {genome_number} \tFitness {g.fitness} \tBest fitness {best_fitness} \tError {error} \tScore {score}")
         genome_number += 1
     generation_number += 1
     if generation_number % 20 == 0:
@@ -301,6 +300,23 @@ def eval_fitness(genomes):
         # export population
         # save_object(pop,'population.dat')
         # export population
+
+    global list_best_fitness
+    global fig
+    list_best_fitness.append(best_fitness)
+    line_best_fitness.set_ydata(np.array(list_best_fitness))
+    line_best_fitness.set_xdata(list(range(len(list_best_fitness))))
+    plt.xlim(0, len(list_best_fitness)-1)
+    fig.canvas.draw()
+    fig.canvas.flush_events()
+
+
+list_best_fitness = []
+plt.ion()
+fig = plt.figure()
+plt.title('Best fitness')
+ax = fig.add_subplot(111)
+line_best_fitness, = ax.plot(list_best_fitness, 'r-')  # Returns a tuple of line objects, thus the comma
 
 pop = population.Population('alt_config')
 if len(sys.argv) > 1:
