@@ -8,7 +8,7 @@ import sys
 import pickle
 
 rendering = True
-debuggin = True
+debuggin = False
 renderdelay = 0
 
 
@@ -119,12 +119,27 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     right_wall = 1
     right_food = 0
     
+    food_x = 0
+    food_y = 0
+    for x in range(0,len(game_matrix)):
+        for y in range(0,len(game_matrix)):
+            if game_matrix[x][y] == 2:
+                food_x = x
+                food_y = y
+
     px = position_x + dx 
     py = position_y + dy 
-
     if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
         straight_wall = game_matrix[px][py]
-        straight_food = game_matrix[px][py]
+
+    if dx != 0:
+        if food_y == py:
+            straight_food = abs(food_x - px)
+
+    if dy != 0:
+        if food_x == px:
+            straight_food = abs(food_y - py)
+
 
     position_x, position_y = position
     (dx, dy) = left(orientation)
@@ -132,16 +147,41 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     py = position_y + dy 
     if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
         left_wall = game_matrix[px][py]
-        left_food = game_matrix[px][py] 
+    
+    if dx != 0:
+        if food_y == py:
+            left_food = abs(food_x - px)
+
+    if dy != 0:
+        if food_x == px:
+            left_food = abs(food_y - py)
 
     position_x, position_y = position
     (dx, dy) = right(orientation)
     px = position_x + dx 
     py = position_y + dy 
+    
     if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
         right_wall = game_matrix[px][py]
-        right_food = game_matrix[px][py]
     
+    if dx != 0:
+        if food_y == py:
+            right_food = abs(food_x - px)
+
+    if dy != 0:
+        if food_x == px:
+            right_food = abs(food_y - py)
+
+    
+    if straight_wall == 2:
+        straight_wall = 0
+    
+    if left_wall == 2:
+        left_wall = 0
+    
+    if right_wall == 2:
+        right_wall = 0
+
     return [straight_wall, straight_food, left_wall, left_food, right_wall, right_food]
 
 
