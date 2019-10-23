@@ -8,6 +8,8 @@ import sys
 import pickle
 
 rendering = True
+debuggin = False
+renderdelay = 0
 blockSize = 32  # size of blocks
 width = 12  # size of field width in blocks
 height = 12
@@ -15,6 +17,8 @@ screenSize = (width * blockSize, height * blockSize)
 speed = 1  # milliseconds per step
 bg_color = 0x000000
 snake_color = 0xFFFFFF
+temp_speed = 0
+
 
 best_fitness = 0
 
@@ -206,13 +210,11 @@ def eval_fitness(genomes):
         dx = 1
         dy = 0
         score = 0.0
-        speed = 200
         hunger = 100
         # Create the field, the snake and a bit of food
         theField = field.Field(screen, width, height, blockSize, bg_color)
         theFood = food.Food(theField)
         theSnake = snake.Snake(theField, snake_color, 5)
-        pygame.time.set_timer(pygame.USEREVENT, speed)
         snake_head_x, snake_head_y = theSnake.body[0]
         dist = math.sqrt((snake_head_x - theFood.x) ** 2 + (snake_head_y - theFood.y) ** 2)
         error = 0
@@ -233,16 +235,24 @@ def eval_fitness(genomes):
                 head_x += dx
                 head_y += dy
                 inputs = get_inputs(matrix, (head_x, head_y), (dx, dy))
+                if debuggin:
+                    print(inputs)
+                 #if dist straight food < dist straight wall
                 previous_state = inputs[1] < inputs[0]
+                
+                # -----------------------
+                # Não entendi a utilidade deste bloco (mesmo comentar os ifs) por isso comentei
+                #if dist left wall < dist to tail
                 if inputs[4] < inputs[3]:
                     inputs[4] = 1
                 else:
                     inputs[4] = 0
-
+                #if dist right wall < dist left tail
                 if inputs[7] < inputs[6]:
                     inputs[4] = 1
                 else:
                     inputs[4] = 0
+                # -----------------------
                 outputs = net.serial_activate(inputs)
                 direction = outputs.index(max(outputs))
                 if direction == 0:  # dont turn
@@ -275,7 +285,6 @@ def eval_fitness(genomes):
 
             if theSnake.body[0] == (theFood.x, theFood.y):
                 theSnake.grow()
-                speed -= 5
                 theFood = food.Food(theField)  # make a new piece of food
                 score += 5
                 hunger += 100
@@ -284,22 +293,31 @@ def eval_fitness(genomes):
                 theFood.draw()
                 theSnake.draw()
                 pygame.display.update()
+                pygame.time.wait(renderdelay)
                 # nao sei se isso ajuda :s parece que só ta lento mesmo
                 # clock.tick(0)
 
+            ## pessoa não vai jogar não
+            # if event.type == pygame.KEYDOWN:  # key pressed
+            #     if event.key == pygame.K_LEFT:
+            #         dx = -1
+            #         dy = 0
+            #     elif event.key == pygame.K_RIGHT:
+            #         dx = 1
+            #         dy = 0
+            #     elif event.key == pygame.K_DOWN:
+            #         dx = 0
+            #         dy = 1
+            #     elif event.key == pygame.K_UP:
+            #         dx = 0
+            #         dy = -1
             if event.type == pygame.KEYDOWN:  # key pressed
                 if event.key == pygame.K_LEFT:
-                    dx = -1
-                    dy = 0
+                    temp_speed = 200
+                    pygame.time.set_timer(pygame.USEREVENT, temp_speed)
                 elif event.key == pygame.K_RIGHT:
-                    dx = 1
-                    dy = 0
-                elif event.key == pygame.K_DOWN:
-                    dx = 0
-                    dy = 1
-                elif event.key == pygame.K_UP:
-                    dx = 0
-                    dy = -1
+                    temp_speed = speed
+                    pygame.time.set_timer(pygame.USEREVENT, temp_speed)
 
         # Game over!
         if rendering:
