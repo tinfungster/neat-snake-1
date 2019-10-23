@@ -28,6 +28,7 @@ best_foods = 0
 best_fitness = 0
 loop_punishment = 0.25
 near_food_score = 0.2
+moved_score = 0.01
 
 # Initialize pygame and open a window
 pygame.init()
@@ -112,6 +113,9 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     # print "orientation",dx,dy
     position_x, position_y = position
     # print "position",position_x,position_y
+
+    straight_food_near, left_food_near, right_food_near = 0, 0, 0
+
     straight_wall = 1
     straight_food = 0
 
@@ -192,14 +196,17 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
         (dx, dy) = orientation
         distStraight = abs(position_x+dx-food_x + position_y+dy-food_y)
         if distLeft < distRight and distLeft < distStraight:
-            left_food = 0.5
+            left_food_near = 1
         elif distRight < distLeft and distRight < distStraight:
-            right_food = 0.5
+            right_food_near = 1
         elif distStraight < distLeft and distStraight < distLeft:
-            straight_food = 0.5
+            straight_food_near = 1
 
-
-    return [straight_wall, straight_food, left_wall, left_food, right_wall, right_food]
+    return [
+        straight_wall, straight_food, straight_food_near,
+        left_wall, left_food, left_food_near,
+        right_wall, right_food, right_food_near
+    ]
 
 
 def save_best_generation_instance(instance, filename='best_generation_instances.bin'):
@@ -286,10 +293,11 @@ def eval_fitness(genomes):
                 else:
                     inputs = get_inputs(matrix, (head_x, head_y), (dx, dy))
                     
-                    current_state = inputs[1] < inputs[0]
-
-                    wall, bread, wall_left, bread_left, wall_right, bread_right = (inputs)
+                    # current_state = inputs[1] < inputs[0]
+                    #
+                    # wall, bread, wall_left, bread_left, wall_right, bread_right = (inputs)
                     ##score += math.sqrt((theFood.x - theSnake.body[0][0]) ** 2 + (theFood.y - theSnake.body[0][1]) ** 2)
+                    score += moved_score
                     pass
 
             # loop punishment
