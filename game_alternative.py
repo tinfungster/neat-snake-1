@@ -24,8 +24,10 @@ bg_color = 0x000000
 snake_color = 0xFFFFFF
 temp_speed = 0
 
-
+best_foods = 0
 best_fitness = 0
+loop_punishment = 0.25
+near_food_score = 0.2
 
 # Initialize pygame and open a window
 pygame.init()
@@ -209,6 +211,7 @@ def save_best_generation_instance(instance, filename='best_generation_instances.
 
 def eval_fitness(genomes):
     global best_fitness
+    global best_foods
     global screen
     global width
     global height
@@ -238,6 +241,11 @@ def eval_fitness(genomes):
         dist = math.sqrt((snake_head_x - theFood.x) ** 2 + (snake_head_y - theFood.y) ** 2)
         error = 0
         countFrames = 0
+
+        pastPoints = set()
+
+        foods = 0
+
         while True:
             countFrames += 1
 
@@ -284,11 +292,24 @@ def eval_fitness(genomes):
                     ##score += math.sqrt((theFood.x - theSnake.body[0][0]) ** 2 + (theFood.y - theSnake.body[0][1]) ** 2)
                     pass
 
+            # loop punishment
+            if theSnake.body[0] in pastPoints:
+                score -= loop_punishment
+            pastPoints.add(theSnake.body[0])
+
+            # food
             if theSnake.body[0] == (theFood.x, theFood.y):
+                pastPoints = set()
                 theSnake.grow()
                 theFood = food.Food(theField)  # make a new piece of food
                 score += 5
                 hunger += 100
+                foods += 1
+            else:
+                # near food score
+                if abs(theSnake.body[0][0] - theFood.x + theSnake.body[0][1] - theFood.y) <= 1:
+                    score += near_food_score
+
             if rendering:
                 theField.draw()
                 theFood.draw()
@@ -313,7 +334,7 @@ def eval_fitness(genomes):
                 pygame.display.update()
 
         # pygame.time.wait(100)
-        score = positive(score)
+        # score = positive(score)
         g.fitness = score/100
 
         if not best_instance or g.fitness > best_fitness:
@@ -324,10 +345,10 @@ def eval_fitness(genomes):
                 'genome': g,
                 'net': net,
             }
-
+        best_foods = max(best_foods, foods)
         best_fitness = max(best_fitness, g.fitness)
         # if debuggin:
-        print(f"Generation {generation_number} \tGenome {genome_number} \tFitness {g.fitness} \tBest fitness {best_fitness} \tError {error} \tScore {score}")
+        print(f"Generation {generation_number} \tGenome {genome_number} \tFoods {foods} \tBF {best_foods} \tFitness {g.fitness} \tBest fitness {best_fitness} \tScore {score}")
         genome_number += 1
 
     save_best_generation_instance(best_instance)
