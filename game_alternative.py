@@ -160,7 +160,7 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     px = position_x + dx 
     py = position_y + dy 
     
-    if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
+    if 0 <= px < len(game_matrix) and 0 <= py < len(game_matrix[0]):
         right_wall = game_matrix[px][py]
     
     if dx != 0:
@@ -180,6 +180,21 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     
     if right_wall == 2:
         right_wall = 0
+
+    if left_food == 0 and right_food == 0 and straight_food == 0:
+        (dx, dy) = left(orientation)
+        distLeft = abs(position_x+dx-food_x + position_y+dy-food_y)
+        (dx, dy) = right(orientation)
+        distRight = abs(position_x+dx-food_x + position_y+dy-food_y)
+        (dx, dy) = orientation
+        distStraight = abs(position_x+dx-food_x + position_y+dy-food_y)
+        if distLeft < distRight and distLeft < distStraight:
+            left_food = 0.5
+        elif distRight < distLeft and distRight < distStraight:
+            right_food = 0.5
+        elif distStraight < distLeft and distStraight < distLeft:
+            straight_food = 0.5
+
 
     return [straight_wall, straight_food, left_wall, left_food, right_wall, right_food]
 
@@ -213,7 +228,9 @@ def eval_fitness(genomes):
         snake_head_x, snake_head_y = theSnake.body[0]
         dist = math.sqrt((snake_head_x - theFood.x) ** 2 + (snake_head_y - theFood.y) ** 2)
         error = 0
+        countFrames = 0
         while True:
+            countFrames += 1
 
             event = pygame.event.wait()
 
