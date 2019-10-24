@@ -1,5 +1,7 @@
 import os
 from neat import nn, population
+import statistics
+import visualize
 import pygame
 import field
 import food
@@ -16,8 +18,8 @@ renderdelay = 0
 
 
 blockSize = 16  # size of blocks
-width = 12  # size of field width in blocks
-height = 12
+width = 16  # size of field width in blocks
+height = 16
 screenSize = (width * blockSize, height * blockSize)
 speed = 1  # milliseconds per step
 bg_color = 0x000000
@@ -93,6 +95,17 @@ def left(orientation):
         (dx, dy) = (-1, 0)
     return (dx, dy)
 
+def semi_left(orientation):
+    (dx, dy) = orientation
+    if (dx, dy) == (-1, 0):
+        dy = 1
+    elif (dx, dy) == (0, 1):
+        dx = 1
+    elif (dx, dy) == (1, 0):
+        dy = -1
+    elif (dx, dy) == (0, -1):
+        dx = -1
+    return (dx, dy)
 
 def right(orientation):
     (dx, dy) = orientation
@@ -104,112 +117,87 @@ def right(orientation):
         (dx, dy) = (0, 1)
     elif (dx, dy) == (0, 1):
         (dx, dy) = (-1, 0)
-
     return (dx, dy)
 
+def semi_right(orientation):
+    (dx, dy) = orientation
+    if (dx, dy) == (-1, 0):
+        dy = -1
+    elif (dx, dy) == (0, -1):
+        dx = 1
+    elif (dx, dy) == (1, 0):
+        dy = 1
+    elif (dx, dy) == (0, 1):
+        dx = -1
+    return (dx, dy)
+
+def look_to (orient, pos, game_matrix):
+    dx, dy = orient
+    px, py = pos
+
+    body_found = False
+    food_found = False
+    
+    dist_food = width
+    dist_tail = width
+    dist_wall = width
+
+    dist = 0
+
+    while px >= 0 and px < width and py >= 0 and py < height:
+        if not body_found and game_matrix[px][py] == 1:
+            dist_tail = dist
+            body_found = True
+        if not food_found and game_matrix[px][py] == 2:
+            dist_food = dist
+            food_found = True
+
+        dist_wall = dist
+        px += dx
+        py += dy
+        dist += 1
+    
+    return (dist_wall, dist_food, dist_tail)
 
 def get_inputs(game_matrix, position, orientation):  # (dx,dy)
+    
     dx, dy = orientation
-    # print "orientation",dx,dy
-    position_x, position_y = position
-    # print "position",position_x,position_y
-
-    straight_food_near, left_food_near, right_food_near = 0, 0, 0
-
-    straight_wall = 1
-    straight_food = 0
-
-    left_wall = 1
-    left_food = 0
-
-    right_wall = 1
-    right_food = 0
+    px, py = position
     
-    food_x = 0
-    food_y = 0
-    for x in range(0,len(game_matrix)):
-        for y in range(0,len(game_matrix)):
-            if game_matrix[x][y] == 2:
-                food_x = x
-                food_y = y
-
-    px = position_x + dx 
-    py = position_y + dy 
-    if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
-        straight_wall = game_matrix[px][py]
-
-    if dx != 0:
-        if food_y == py:
-            straight_food = abs(food_x - px)
-
-    if dy != 0:
-        if food_x == px:
-            straight_food = abs(food_y - py)
-
-
-    position_x, position_y = position
-    (dx, dy) = left(orientation)
-    px = position_x + dx 
-    py = position_y + dy 
-    if px >= 0 and px < len(game_matrix) and py >= 0  and py < len(game_matrix[0]):
-        left_wall = game_matrix[px][py]
+    dist_straight_wall, dist_straight_food, dist_straight_tail = look_to((dx, dy), position, game_matrix)
     
-    if dx != 0:
-        if food_y == py:
-            left_food = abs(food_x - px)
+    dx, dy = left(orientation)
+    dist_left_wall, dist_left_food, dist_left_tail = look_to((dx, dy), position, game_matrix)
 
-    if dy != 0:
-        if food_x == px:
-            left_food = abs(food_y - py)
+    dx, dy = right(orientation)
+    dist_right_wall, dist_right_food, dist_right_tail = look_to((dx, dy), position, game_matrix)
 
-    position_x, position_y = position
-    (dx, dy) = right(orientation)
-    px = position_x + dx 
-    py = position_y + dy 
+    dx, dy = semi_left(orientation)
+    dist_straight_left_wall, dist_straight_left_food, dist_straight_left_tail = look_to((dx, dy), position, game_matrix)
+
+    dx, dy = semi_left(left(orientation))
+    dist_left_left_wall, dist_left_left_food, dist_left_left_tail = look_to((dx, dy), position, game_matrix)
+
+    dx, dy = semi_right(orientation)
+    dist_straight_right_wall, dist_straight_right_food, dist_straight_right_tail = look_to((dx, dy), position, game_matrix)
+
+    dx, dy = semi_right(right(orientation))
+    dist_right_right_wall, dist_right_right_food, dist_right_right_tail = look_to((dx, dy), position, game_matrix)
+
+    # ## teste caudas
+    # if dist_straight_wall > dist_straight_tail:
+    #      dist_straight_wall = dist_straight_tail
+
+    # if dist_left_wall > dist_left_tail:
+    #      dist_left_wall = dist_left_tail
     
-    if 0 <= px < len(game_matrix) and 0 <= py < len(game_matrix[0]):
-        right_wall = game_matrix[px][py]
-    
-    if dx != 0:
-        if food_y == py:
-            right_food = abs(food_x - px)
+    # if dist_right_wall > dist_right_tail:
+    #      dist_right_wall = dist_right_tail
 
-    if dy != 0:
-        if food_x == px:
-            right_food = abs(food_y - py)
-
-    
-    if straight_wall == 2:
-        straight_wall = 0
-    
-    if left_wall == 2:
-        left_wall = 0
-    
-    if right_wall == 2:
-        right_wall = 0
-
-    if left_food == 0 and right_food == 0 and straight_food == 0:
-        (dx, dy) = left(orientation)
-        distLeft = abs(position_x+dx-food_x + position_y+dy-food_y)
-        (dx, dy) = right(orientation)
-        distRight = abs(position_x+dx-food_x + position_y+dy-food_y)
-        (dx, dy) = orientation
-        distStraight = abs(position_x+dx-food_x + position_y+dy-food_y)
-        if distLeft < distRight and distLeft < distStraight:
-            left_food_near = 1
-        elif distRight < distLeft and distRight < distStraight:
-            right_food_near = 1
-        elif distStraight < distLeft and distStraight < distLeft:
-            straight_food_near = 1
-
-    return [
-        straight_wall, straight_food, straight_food_near,
-        left_wall, left_food, left_food_near,
-        right_wall, right_food, right_food_near
-    ]
+    return [dist_straight_wall, dist_straight_food, dist_straight_tail, dist_left_wall, dist_left_food, dist_left_tail, dist_right_wall, dist_right_food, dist_right_tail, dist_straight_left_wall, dist_straight_left_food, dist_straight_left_tail, dist_left_left_wall, dist_left_left_food, dist_left_left_tail, dist_straight_right_wall, dist_straight_right_food, dist_straight_right_tail, dist_right_right_wall, dist_right_right_food, dist_right_right_tail]
 
 
-def save_best_generation_instance(instance, filename='best_generation_instances.bin'):
+def save_best_generation_instance(instance, filename='best_generation_instances.pickle'):
     instances = []
     if os.path.isfile(filename):
         instances = load_object(filename)
@@ -235,16 +223,15 @@ def run():
         
 
         g = maior_obj['genome']
-        if(g.num_inputs < 9):
+        if(g.num_inputs < 21):
             continue
 
-        if(maior_obj['fitness']< 0.5):
+        if(maior_obj['fitness']< 0.4):
             continue
             
         net = maior_obj['net']
         
-
-
+        visualize.draw_net(g, view=True, filename="xor2-all.gv")
         # net = nn.create_feed_forward_phenotype(g)
         dx = 1
         dy = 0

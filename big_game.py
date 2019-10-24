@@ -144,7 +144,7 @@ def look_to (orient, pos, game_matrix):
 
     dist = 0
 
-    while px > 0 and px < width and py > 0 and py < height:
+    while px >= 0 and px < width and py >= 0 and py < height:
         if not body_found and game_matrix[px][py] == 1:
             dist_tail = dist
             body_found = True
@@ -316,7 +316,7 @@ def eval_fitness(genomes):
 
         # Game over!
         if rendering:
-            for i in range(0, 10):
+            for i in range(0, 2):
                 theField.draw()
                 theFood.draw()
                 theSnake.draw(damage=(i % 2 == 0))
