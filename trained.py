@@ -15,6 +15,7 @@ import numpy as np
 rendering = True
 debuggin = False
 renderdelay = 0
+renderdelay_low = 10
 
 
 blockSize = 16  # size of blocks
@@ -218,20 +219,21 @@ def run():
     global snake_color
     
     instances = load_object("best_generation_instances.pickle")
-    
+    index = 0
     for maior_obj in instances:
         
 
         g = maior_obj['genome']
         if(g.num_inputs < 21):
             continue
-
-        if(maior_obj['fitness']< 0.4):
+        
+        if(maior_obj['fitness'] < 1):
             continue
-            
+
         net = maior_obj['net']
         
-        visualize.draw_net(g, view=True, filename="xor2-all.gv")
+        
+        index += 1
         # net = nn.create_feed_forward_phenotype(g)
         dx = 1
         dy = 0
@@ -324,7 +326,7 @@ def run():
 
             if event.type == pygame.KEYDOWN:  # key pressed
                 if event.key == pygame.K_LEFT:
-                    temp_speed = 200
+                    temp_speed = renderdelay_low
                     pygame.time.set_timer(pygame.USEREVENT, temp_speed)
                 elif event.key == pygame.K_RIGHT:
                     temp_speed = speed
@@ -344,6 +346,9 @@ def run():
 
         best_foods = max(best_foods, foods)
         best_fitness = max(best_fitness, g.fitness)
+        if foods > 1:
+            visualize.draw_net(g, view=False, filename="networks/"+str(index)+"-"+str(foods)+"-"+str(maior_obj['num_generation'])+".rede")
+        
         print("foods",foods, "\tscore","%.2f"%score, "\toriginal fit", "%.2f"%maior_obj['fitness'], "\tgeneration" "%.2f"%maior_obj['num_generation'])
         # if debuggin:
         # print(f"Generation {generation_number} \tGenome {genome_number} \tFoods {foods} \tBF {best_foods} \tFitness {g.fitness} \tBest fitness {best_fitness} \tScore {score}")

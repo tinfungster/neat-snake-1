@@ -1,7 +1,7 @@
 # Snake-NEAT
 Integrating Neural Evolution In Augmented Topologies in a snake game to make it a self learner.
 
-![](./screen_shot_1.png)
+![](demo/demo.gif)
 
 
 # Requirements
