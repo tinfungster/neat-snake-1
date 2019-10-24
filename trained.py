@@ -237,6 +237,10 @@ def run():
         g = maior_obj['genome']
         if(g.num_inputs < 9):
             continue
+
+        if(maior_obj['fitness']< 0.5):
+            continue
+            
         net = maior_obj['net']
         
 
