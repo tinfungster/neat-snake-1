@@ -1,7 +1,7 @@
 import os
 from neat import nn, population
-import statistics
-import visualize
+import neatlib.statistics
+import neatlib.visualize
 import pygame
 import field
 import food
@@ -198,7 +198,7 @@ def get_inputs(game_matrix, position, orientation):  # (dx,dy)
     return [dist_straight_wall, dist_straight_food, dist_straight_tail, dist_left_wall, dist_left_food, dist_left_tail, dist_right_wall, dist_right_food, dist_right_tail, dist_straight_left_wall, dist_straight_left_food, dist_straight_left_tail, dist_left_left_wall, dist_left_left_food, dist_left_left_tail, dist_straight_right_wall, dist_straight_right_food, dist_straight_right_tail, dist_right_right_wall, dist_right_right_food, dist_right_right_tail]
 
 
-def save_best_generation_instance(instance, filename='best_generation_instances.pickle'):
+def save_best_generation_instance(instance, filename='trained/best_generation_instances.pickle'):
     instances = []
     if os.path.isfile(filename):
         instances = load_object(filename)
@@ -218,7 +218,7 @@ def run():
     global bg_color
     global snake_color
     
-    instances = load_object("best_generation_instances.pickle")
+    instances = load_object("trained/best_generation_instances.pickle")
     index = 0
     for maior_obj in instances:
         
@@ -259,7 +259,7 @@ def run():
 
             if event.type == pygame.QUIT:  # window closed
                 print("Quittin")
-                save_object(pop, 'population.dat')  ## export population
+                save_object(pop, 'trained/population.dat')  ## export population
                 pygame.quit()
                 sys.exit()
 
