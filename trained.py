@@ -227,7 +227,7 @@ def run():
         if(g.num_inputs < 21):
             continue
         
-        if(maior_obj['fitness'] < 1):
+        if(maior_obj['fitness'] < .8):
             continue
 
         net = maior_obj['net']
