@@ -229,7 +229,7 @@ def run():
     global bg_color
     global snake_color
     
-    instances = load_object("best_generation_instances.bin")
+    instances = load_object("best_generation_instances.pickle")
     
     for maior_obj in instances:
         
@@ -237,6 +237,10 @@ def run():
         g = maior_obj['genome']
         if(g.num_inputs < 9):
             continue
+
+        if(maior_obj['fitness']< 0.5):
+            continue
+            
         net = maior_obj['net']
         
 
