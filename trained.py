@@ -144,7 +144,7 @@ def look_to (orient, pos, game_matrix):
 
     dist = 0
 
-    while px >= 0 and px < width and py >= 0 and py < height:
+    while 0 <= px < width and 0 <= py < height:
         if not body_found and game_matrix[px][py] == 1:
             dist_tail = dist
             body_found = True
