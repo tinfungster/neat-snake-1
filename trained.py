@@ -1,11 +1,11 @@
 import os
 from neat import nn, population
-import neatlib.statistics
-import neatlib.visualize
+import neatlib.statistics as statistics
+import neatlib.visualize as visualize
 import pygame
-import field
-import food
-import snake
+import model.field as field
+import model.food as food
+import model.snake as snake
 import math
 import sys
 import pickle
@@ -15,7 +15,7 @@ import numpy as np
 rendering = True
 debuggin = False
 renderdelay = 0
-renderdelay_low = 10
+renderdelay_low = 50
 
 
 blockSize = 16  # size of blocks

@@ -4,7 +4,7 @@ from __future__ import print_function
 import copy
 import warnings
 
-from statistics import get_average_fitness, get_species_sizes
+from neatlib.statistics import get_average_fitness, get_species_sizes
 
 try:
     import graphviz
