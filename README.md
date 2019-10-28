@@ -29,3 +29,9 @@ python game.py population.dat
 
 # Notes
 The game is still under development. The snake is still not able to always go to the food, but it can find 50+ foods.
+
+## Academic
+
+There are several challenges when modeling artificial intelligence methods for autonomous players on games (bots). NEAT is one of the models that, combining genetic algorithms and neural networks, seek to describe a bot behavior more intelligently. 
+
+In NEAT, a neural network is used for decision making, taking relevant inputs from the environment and giving real-time decisions. In a more abstract way, a genetic algorithm is applied for the learning step of the neural networks' weights, layers, and parameters.
