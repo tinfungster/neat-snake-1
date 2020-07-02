@@ -221,7 +221,7 @@ def eval_fitness(genomes):
         # Create the field, the snake and a bit of food
         theField = field.Field(screen, width, height, blockSize, bg_color)
         theFood = food.Food(theField)
-        theSnake = snake.Snake(theField, snake_color, 5)
+        theSnake = snake.Snake(theField, snake_color, 5, x = int(width/2), y=int(height/2))
         snake_head_x, snake_head_y = theSnake.body[0]
         dist = math.sqrt((snake_head_x - theFood.x) ** 2 + (snake_head_y - theFood.y) ** 2)
         error = 0

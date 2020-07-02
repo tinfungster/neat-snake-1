@@ -243,7 +243,7 @@ def run():
         theField = field.Field(screen, width, height, blockSize, bg_color)
         theFood = food.Food(theField)
         theSnake = snake.Snake(theField, snake_color, 5)
-        snake_head_x, snake_head_y = theSnake.body[0]
+        theSnake = snake.Snake(theField, snake_color, 5, x = int(width/2), y=int(height/2))
         dist = math.sqrt((snake_head_x - theFood.x) ** 2 + (snake_head_y - theFood.y) ** 2)
         error = 0
         countFrames = 0
